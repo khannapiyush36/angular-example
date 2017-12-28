@@ -13,9 +13,9 @@
     <table>
         <th class='index'> S.No. </th>
         <th class='title' ng-click="sortMe('name')"> Name </th> 
-        <th class='pubdate' ng-click="sortByDate()"> Email </th>
+        <th class='pubdate' ng-click="sortMe('email')"> Email </th>
         <th class='summary'> About </th>
-        <th class='category' ng-click="sortMe('category')"> Company </th>
+        <th class='category' ng-click="sortMe('company')"> Company </th>
         <tr class='result-item' ng-repeat="x in output | filter:filterTerm | orderBy:sortParam:reverse"> 
             <td class='index'> {{$index + 1}} </td>
             <td class='title'> {{x.name}} </td>

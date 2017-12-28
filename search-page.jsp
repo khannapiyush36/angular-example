@@ -24,7 +24,10 @@
                         resolve: {
                             term : function(searchInputService) {
 								return searchInputService.getTerm();
-                            } 
+                            },
+                            results : function(searchService) {
+								return searchService.getResults();
+                            }
                         }
                     }).
                     otherwise({
@@ -40,6 +43,11 @@
                     $rootScope.$on('$routeChangeSuccess', function(evt, next, current) {
                         $timeout(function() {
 							$('body').removeClass('loading');
+                            if(next.loadedTemplateUrl === 'search-results.html') {
+								$(document).ready(function() {
+                                    $('table tr').slice(0, 11).show();
+                                });
+                            }
                         }, 500);
                     });
                 });
@@ -61,9 +69,6 @@
                                 url: '/content/dam/angular/data.json',
                             }).then(function(response){
                                 deferred.resolve(response.data);
-                                $(document).ready(function() {
-                                    $('table tr').slice(0, 11).show();
-                                }); 
                             });
                         });
                         return deferred.promise;
@@ -88,7 +93,7 @@
                     return {getTerm: getTerm, setTerm: setTerm, getFreqTerm: getFreqTerm, setFreqTerm: setFreqTerm};
                 });
 
-                app.controller('searchResultCtrl', function($scope, term) {
+                app.controller('searchResultCtrl', function($scope, term, results) {
                     $scope.searchTerm = term;
                     $scope.reverse = false;
                     $scope.sortMe = function(sortParam) {
@@ -101,9 +106,7 @@
                             return new Date(x.pubDate);
                         }    
                     }
-                    $(document).ready(function() {
-                        $(".submit").trigger("click");
-                    }); 
+                    $scope.output = results;
                 });
 
                 app.controller('searchLandingCtrl', function($scope) {
@@ -132,6 +135,7 @@
                         }
                     }
                 });
+
                 app.directive('searchPage', function() {
                     return {
                         restrict: 'A',
@@ -142,6 +146,7 @@
                         }
                     }
                 });
+
                 app.directive('loadResultPage', ['$location', 'searchInputService',
                                                  function($location, searchInputService) {
                     return {
