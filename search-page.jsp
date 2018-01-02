@@ -33,7 +33,8 @@
                     otherwise({
                         redirectTo: '/landing'
                     });
-                    $locationProvider.html5Mode(true);
+                    $locationProvider.html5Mode(false);
+                    $locationProvider.hashPrefix('');
                 });
 
                 app.run(function($rootScope, $timeout) {
