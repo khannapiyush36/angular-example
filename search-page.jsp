@@ -94,8 +94,9 @@
                     return {getTerm: getTerm, setTerm: setTerm, getFreqTerm: getFreqTerm, setFreqTerm: setFreqTerm};
                 });
 
-                app.controller('searchResultCtrl', function($scope, term, results) {
-                    $scope.searchTerm = term;
+                app.controller('searchResultCtrl', function($scope, $window, results) {
+                    var queryParam = $window.location.search;
+                    $scope.searchTerm = queryParam.substring(queryParam.indexOf('?')+3);
                     $scope.reverse = false;
                     $scope.sortMe = function(sortParam) {
                         $scope.sortParam = sortParam;
