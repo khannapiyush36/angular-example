@@ -8,6 +8,6 @@
     </form>
     <div class="freq-search">
         <span class="text">Frequently searched terms: </span>
-        <a href="/content/angular/search-page.html#/results/term/market"><span>market</span></a>
+        <a href="/content/angular/results/market"><span>market</span></a>
     </div>
 </div>

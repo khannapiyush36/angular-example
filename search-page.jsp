@@ -18,13 +18,10 @@
                         templateUrl: 'search-landing.html',
                         controller: 'searchLandingCtrl'
                     }).
-                    when('/results/term/:q', {
+                    when('/results/:q', {
                         templateUrl: 'search-results.html',
                         controller: 'searchResultCtrl',
                         resolve: {
-                            term : function(searchInputService) {
-								return searchInputService.getTerm();
-                            },
                             results : function(searchService) {
 								return searchService.getResults();
                             }
@@ -33,8 +30,8 @@
                     otherwise({
                         redirectTo: '/landing'
                     });
-                    $locationProvider.html5Mode(false);
-                    $locationProvider.hashPrefix('');
+                    $locationProvider.html5Mode(true);
+                    //$locationProvider.hashPrefix('');
                 });
 
                 app.run(function($rootScope, $timeout) {
@@ -111,7 +108,7 @@
 
                 app.controller('searchLandingCtrl', function($scope, $location) {
                     $scope.formSubmit = function() {
-                        $location.url('/results/term/' + $scope.searchTerm);
+                        $location.url('/results/' + $scope.searchTerm);
                     }
 
                 });
