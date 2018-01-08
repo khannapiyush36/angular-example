@@ -18,7 +18,7 @@
                         templateUrl: 'search-landing.html',
                         controller: 'searchLandingCtrl'
                     }).
-                    when('/results', {
+                    when('/results/term/:q', {
                         templateUrl: 'search-results.html',
                         controller: 'searchResultCtrl',
                         resolve: {
@@ -89,10 +89,9 @@
                     return {getTerm: getTerm, setTerm: setTerm, getFreqTerm: getFreqTerm, setFreqTerm: setFreqTerm};
                 });
 
-                app.controller('searchResultCtrl', function($scope, $window, results) {
+                app.controller('searchResultCtrl', function($scope, $routeParams, results) {
                     $scope.rowsToBeShown = 9;
-                    var queryParam = $window.location.search;
-                    $scope.searchTerm = queryParam.substring(queryParam.indexOf('?') + 3);
+                    $scope.searchTerm = $routeParams.q;
                     $scope.reverse = false;
                     $scope.sortMe = function(sortParam) {
                         $scope.sortParam = sortParam;
@@ -110,7 +109,10 @@
                     }
                 });
 
-                app.controller('searchLandingCtrl', function($scope) {
+                app.controller('searchLandingCtrl', function($scope, $location) {
+                    $scope.formSubmit = function() {
+                        $location.url('/results/term/' + $scope.searchTerm);
+                    }
 
                 });
 
