@@ -136,12 +136,12 @@
                     }
                 });
 
-                app.directive('searchPage', function() {
+                app.directive('searchPage', function($window) {
                     return {
                         restrict: 'A',
                         link: function($scope, element, attrs) {
                             element.click(function() {
-                                window.location.href = "/content/angular/search-page.html";
+                                $window.location.href = "/content/angular/search-page.html";
                             });
                         }
                     }
@@ -150,11 +150,13 @@
                 app.directive('loadMoreDir', function() {
                     return {
                         restrict: 'A',
-                        scope: false,
+                        scope: {
+                            rowCount: '='
+                        },
                         link: function($scope, element, attrs) {
                             element.click(function() {
                                 $scope.$apply(function() {
-	                                $scope.rowsToBeShown += 10;
+	                                $scope.rowCount += 10;
                                 });
                             });
                         }

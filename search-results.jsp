@@ -26,6 +26,6 @@
         </tr>
     </table>
     <div class="pagination">
-    	<button load-more-dir> Load More </button>
+    	<button row-count="rowsToBeShown" load-more-dir> Load More </button>
     </div>
 </div>
