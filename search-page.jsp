@@ -44,11 +44,6 @@
                     $rootScope.$on('$routeChangeSuccess', function(evt, next, current) {
                         $timeout(function() {
 							$('body').removeClass('loading');
-                            if(next.loadedTemplateUrl === 'search-results.html') {
-								$(document).ready(function() {
-                                    $('table tr').slice(0, 11).show();
-                                });
-                            }
                         }, 500);
                     });
                 });
@@ -95,8 +90,9 @@
                 });
 
                 app.controller('searchResultCtrl', function($scope, $window, results) {
+                    $scope.rowsToBeShown = 9;
                     var queryParam = $window.location.search;
-                    $scope.searchTerm = queryParam.substring(queryParam.indexOf('?')+3);
+                    $scope.searchTerm = queryParam.substring(queryParam.indexOf('?') + 3);
                     $scope.reverse = false;
                     $scope.sortMe = function(sortParam) {
                         $scope.sortParam = sortParam;
@@ -109,6 +105,9 @@
                         }    
                     }
                     $scope.output = results;
+                    $scope.hide = function(index) {
+                        return (index > $scope.rowsToBeShown) ? true : false;
+                    }
                 });
 
                 app.controller('searchLandingCtrl', function($scope) {
@@ -149,34 +148,15 @@
                     }
                 });
 
-                app.directive('loadResultPage', ['$location', 'searchInputService',
-                                                 function($location, searchInputService) {
-                    return {
-                        restrict: 'A',
-                        link: function(scope, element, attrs) {
-                            element.click(function() {
-                                var term = scope.searchTerm;
-                                if(term === undefined) {
-									term = element.get(0).text;
-                                }
-                                searchInputService.setTerm(term);
-                                searchInputService.setFreqTerm(term);
-								scope.$apply(function() {
-	                                $location.path(attrs.loadResultPage);
-                                });
-                            });
-                        }
-                    }
-                }]);
-
                 app.directive('loadMoreDir', function() {
                     return {
                         restrict: 'A',
-                        link: function(scope, element, attrs) {
+                        scope: false,
+                        link: function($scope, element, attrs) {
                             element.click(function() {
-                                var startCount = $('table tr').not(':hidden').length;
-                                var endCount = startCount + 10;
-								$('table tr').slice(startCount, endCount).show();
+                                $scope.$apply(function() {
+	                                $scope.rowsToBeShown += 10;
+                                });
                             });
                         }
                     }
@@ -201,9 +181,6 @@
         }
         table {
             width: 100%;
-        }
-        table tr {
-            display: none;
         }
         table th, table td {
             text-align: center;

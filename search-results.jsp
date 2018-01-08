@@ -3,6 +3,7 @@
         <div class="search">
             <label> Search: </label>
             <input type="text" ng-model="searchTerm" search-term-dir>
+            <input type="hidden" ng-model="rowsToBeShown">
             <input type="submit" class="submit" value="Search" ng-disabled="!searchTerm" get-result-dir="10">
         </div>
         <div class="filter">
@@ -17,11 +18,11 @@
         <th class='summary'> About </th>
         <th class='category' ng-click="sortMe('company')"> Company </th>
         <tr class='result-item' ng-repeat="x in output | filter:filterTerm | orderBy:sortParam:reverse"> 
-            <td class='index'> {{$index + 1}} </td>
-            <td class='title'> {{x.name}} </td>
-            <td class='pubdate'> <a ng-href="mailto:{{x.email}}"> {{ x.email}} </a> </td>
-            <td class='summary'> {{ x.about}} </td>
-            <td class='category'> {{ x.company}} </td>
+            <td class='index' ng-hide="hide($index)"> {{$index + 1}} </td>
+            <td class='title' ng-hide="hide($index)"> {{x.name}} </td>
+            <td class='pubdate' ng-hide="hide($index)"> <a ng-href="mailto:{{x.email}}"> {{ x.email}} </a> </td>
+            <td class='summary' ng-hide="hide($index)"> {{ x.about}} </td>
+            <td class='category' ng-hide="hide($index)"> {{ x.company}} </td>
         </tr>
     </table>
     <div class="pagination">
