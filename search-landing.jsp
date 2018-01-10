@@ -8,6 +8,6 @@
     </form>
     <div class="freq-search">
         <span class="text">Frequently searched terms: </span>
-        <a href="/content/angular/results/market"><span>market</span></a>
+        <a href="javascript:void(0);" ng-click="searchMe($event)"><span>market</span></a>
     </div>
 </div>

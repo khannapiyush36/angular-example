@@ -18,7 +18,7 @@
                         templateUrl: 'search-landing.html',
                         controller: 'searchLandingCtrl'
                     }).
-                    when('/results/:q', {
+                    when('/results', {
                         templateUrl: 'search-results.html',
                         controller: 'searchResultCtrl',
                         resolve: {
@@ -34,7 +34,7 @@
                     //$locationProvider.hashPrefix('');
                 });
 
-                app.run(function($rootScope, $timeout) {
+                app.run(function($rootScope, $timeout, searchInputService) {
                     $rootScope.$on('$routeChangeStart', function(evt, next, current) {
                         $('body').addClass('loading');
                     });
@@ -42,6 +42,9 @@
                         $timeout(function() {
 							$('body').removeClass('loading');
                         }, 500);
+                    });
+                    $rootScope.$on('query', function(event, data) {
+						searchInputService.setTerm(data);
                     });
                 });
 
@@ -86,9 +89,9 @@
                     return {getTerm: getTerm, setTerm: setTerm, getFreqTerm: getFreqTerm, setFreqTerm: setFreqTerm};
                 });
 
-                app.controller('searchResultCtrl', function($scope, $routeParams, results) {
+                app.controller('searchResultCtrl', function($scope, searchInputService, results) {
                     $scope.rowsToBeShown = 9;
-                    $scope.searchTerm = $routeParams.q;
+                    $scope.searchTerm = searchInputService.getTerm();
                     $scope.reverse = false;
                     $scope.sortMe = function(sortParam) {
                         $scope.sortParam = sortParam;
@@ -108,9 +111,13 @@
 
                 app.controller('searchLandingCtrl', function($scope, $location) {
                     $scope.formSubmit = function() {
-                        $location.url('/results/' + $scope.searchTerm);
+                        $location.url('/results');
+                        $scope.$parent.$broadcast('query', $scope.searchTerm);
                     }
-
+                    $scope.searchMe = function($event) {
+                        $scope.searchTerm = $event.currentTarget.text;
+                        $scope.formSubmit();
+                    }
                 });
 
                 app.directive('getResultDir', ['searchService', function(searchService) {
