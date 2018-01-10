@@ -107,6 +107,11 @@
                     $scope.hide = function(index) {
                         return (index > $scope.rowsToBeShown) ? true : false;
                     }
+                    // Watching for scope change and updating view
+                    $scope.$watch('filterTerm', function(newVal, oldVal) {
+						$('.filter input').val(newVal);
+                    });
+                    $scope.filterTerm = 'owe';
                 });
 
                 app.controller('searchLandingCtrl', function($scope, $location) {
@@ -164,6 +169,21 @@
                             element.click(function() {
                                 $scope.$apply(function() {
 	                                $scope.rowCount += 10;
+                                });
+                            });
+                        }
+                    }
+                });
+
+                app.directive('myModel', function() {
+                    return {
+                        restrict: 'A',
+                        scope: false,
+                        link: function($scope, element, attrs) {
+                            element.on('keyup', function() {
+                                $scope.$apply(function() {
+                                    // watching for view change and updating scope
+									$scope.filterTerm = element.get(0).value;
                                 });
                             });
                         }

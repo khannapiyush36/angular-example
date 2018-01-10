@@ -3,12 +3,12 @@
         <div class="search">
             <label> Search: </label>
             <input type="text" ng-model="searchTerm" search-term-dir>
-            <input type="hidden" ng-model="rowsToBeShown">
+            <input type="hidden" name="rowsToBeShown">
             <input type="submit" class="submit" value="Search" ng-disabled="!searchTerm" get-result-dir="10">
         </div>
         <div class="filter">
             <label> Filter: </label>
-            <input type="text" ng-model="filterTerm">
+            <input type="text" my-model="filterTerm">
         </div>
     </div>
     <table>
