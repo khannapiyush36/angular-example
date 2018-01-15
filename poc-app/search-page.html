@@ -104,6 +104,8 @@
                     $scope.hide = function(index) {
                         return (index > $scope.rowsToBeShown) ? true : false;
                     }
+					// Triggering scope change so that watcher in
+					// directive gets notified.
 					$scope.changeScope = function() {
 						$scope.filterTerm = 'owe';
 					}
@@ -185,7 +187,9 @@
                             });
 							// Watching for scope change and updating view
 							$scope.$watch('myModel', function(newVal, oldVal) {
-								$('.filter input').val(newVal);
+								if(newVal !== undefined) {
+									element.get(0).value = newVal;
+								}
 							});
                         }
                     }
@@ -240,15 +244,22 @@
         }
         .searchForm .search {
             display: table-cell;
-            width: 75%;
+            width: 50%;
             text-align: center;
         }
         .searchForm input {
-            width: 250px;
+            width: 200px;
         }
         .searchForm input.submit {
             width: 100px;
         }
+		.searchForm .search-label {
+			display: table-cell;
+			width: 30%;
+		}
+		.searchForm .searchText {
+			padding-left: 10px;
+		}
         .loader-modal {
             display:    none;
             position:   fixed;
@@ -271,7 +282,7 @@
             display: block;
         }
         .freq-search {
-            margin: 30px 80px;
+            margin: 30px 192px;
         }
 		.freq-search .text {
 			font-weight: bold;
