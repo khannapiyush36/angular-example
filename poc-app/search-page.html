@@ -196,16 +196,12 @@
                 });
 				
 				// Example to understand 2-way binding with function call
-				app.directive('searchText', function() {
-                    return {
-                        restrict: 'A',
-						scope: {
-							searchText: '&'
-						},
-						template: '<b> {{searchText()}} </b>',
-						replace: true
-                    }
-                });
+				app.component('searchText', {
+					bindings: {
+						term: '&'
+					},
+					template: '<b> {{$ctrl.term()}} </b>'
+				});
 
             </script>
         <div class="loader-modal"></div>
