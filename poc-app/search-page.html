@@ -9,7 +9,7 @@
 <base href='/poc-app/'/>
 </head>    
     <body ng-app="myApp" ng-cloak>
-        <div class="search-page-link"> <a search-page> Go to Search Page </a></div>
+			<search-page> </search-page>
             <div class='ng-view'></div>
             <script>
                 var app = angular.module('myApp', ['ngRoute','ui.bootstrap']);
@@ -145,15 +145,13 @@
                     }
                 });
 
-                app.directive('searchPage', function($window) {
-                    return {
-                        restrict: 'A',
-                        link: function($scope, element, attrs) {
-                            element.click(function() {
-                                $window.location.href = "/poc-app/search-page.html";
-                            });
-                        }
-                    }
+                app.component('searchPage', {
+					controller: function($window) {
+						this.loadRootPage = function() {
+							$window.location.href = '/poc-app/search-page.html';
+						}
+					},
+					template: '<div class="search-page-link"> <a href="javascript:void(0);" ng-click="$ctrl.loadRootPage()"> Go to Search Page </a> </div>'
                 });
 
                 app.directive('loadMoreDir', function() {
