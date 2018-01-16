@@ -1,13 +1,14 @@
 <div>
     <div class="searchForm">
 		<div class="search-label">
-			<span class="searchText">Showing <b>1-{{rowsToBeShown}}</b> results for <b>{{searchTerm}}</b> 
+			<span class="searchText">Showing <b>1-{{rowsToBeShown}}</b> results for 
+				<span search-text="getSearchTerm"> </span>
 				<span ng-hide="!filterTerm"> with filter <b> {{filterTerm}}</b> </span>
 			</span>
 		</div>
         <div class="search">
             <label> Search: </label>
-            <input type="text" ng-model="searchTerm" search-term-dir>
+            <input type="text" my-model="searchTerm" search-term-dir>
             <input type="hidden" name="rowsToBeShown">
             <input type="submit" class="submit" value="Search" ng-disabled="!searchTerm" get-result-dir="10">
         </div>
@@ -32,6 +33,5 @@
     </table>
     <div class="pagination">
     	<button row-count="rowsToBeShown" load-more-dir> Load More </button>
-		<button ng-click="changeScope()" > Click Me </button>
     </div>
 </div>

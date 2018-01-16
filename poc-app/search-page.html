@@ -86,7 +86,7 @@
                     return {getTerm: getTerm, setTerm: setTerm, getFreqTerm: getFreqTerm, setFreqTerm: setFreqTerm};
                 });
 
-                app.controller('searchResultCtrl', function($scope, searchInputService, results, $timeout) {
+                app.controller('searchResultCtrl', function($scope, searchInputService, results) {
                     $scope.rowsToBeShown = 10;
                     $scope.searchTerm = searchInputService.getTerm();
                     $scope.reverse = false;
@@ -104,10 +104,9 @@
                     $scope.hide = function(index) {
                         return (index > $scope.rowsToBeShown) ? true : false;
                     }
-					// Triggering scope change so that watcher in
-					// directive gets notified.
-					$scope.changeScope = function() {
-						$scope.filterTerm = 'owe';
+					// Function to understand '<' directive scope binding
+					$scope.getSearchTerm = function() {
+						return searchInputService.getTerm();
 					}
                 });
 
@@ -122,19 +121,18 @@
                     }
                 });
 
-                app.directive('getResultDir', ['searchService', function(searchService) {
+                app.directive('getResultDir', function(searchService, $route) {
                     return {
                         restrict: 'A',
+						scope: false,
                         link: function($scope, element, attrs) {
                             element.click(function() {
-                                var itemsToFetch = (attrs.getResultDir !== '') ? attrs.getResultDir : angular.element('.result-item').length + 10;
-                                searchService.getResults($scope.searchTerm, itemsToFetch).then(function(results){
-                                    $scope.output = results;
-                                });
+								$scope.$parent.$broadcast('query', $scope.searchTerm);
+								$route.reload();
                             });
                         }
                     }
-                }]);
+                });
                 
                 app.directive('searchTermDir', function() {
                     return {
@@ -192,6 +190,18 @@
 								}
 							});
                         }
+                    }
+                });
+				
+				// Example to understand 2-way binding with function call
+				app.directive('searchText', function() {
+                    return {
+                        restrict: 'A',
+						scope: {
+							searchText: '<'
+						},
+						template: '<b> {{searchText()}} </b>',
+						replace: true
                     }
                 });
 
