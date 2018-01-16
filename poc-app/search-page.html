@@ -13,6 +13,7 @@
             <div class='ng-view'></div>
             <script>
                 var app = angular.module('myApp', ['ngRoute','ui.bootstrap']);
+				
                 app.config(function($routeProvider, $locationProvider) {
                     $routeProvider.when('/landing', {
                         templateUrl: 'search-landing.html',
@@ -49,6 +50,7 @@
                 });
 
                 app.factory('searchService', function($http, $q) {
+					// Deprecated
                     var getToken = function() {
                         var deferred = $q.defer();
                         $http.get('/libs/granite/csrf/token.json').then(function(response) {
@@ -198,7 +200,7 @@
                     return {
                         restrict: 'A',
 						scope: {
-							searchText: '<'
+							searchText: '&'
 						},
 						template: '<b> {{searchText()}} </b>',
 						replace: true
