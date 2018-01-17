@@ -9,7 +9,7 @@
 <base href='/poc-app/'/>
 </head>    
     <body ng-app="myApp" ng-cloak>
-			<search-page> </search-page>
+			<search-page url='/poc-app/search-page.html'> </search-page>
             <div class='ng-view'></div>
             <script>
                 var app = angular.module('myApp', ['ngRoute','ui.bootstrap']);
@@ -112,14 +112,11 @@
 					}
                 });
 
-                app.controller('searchLandingCtrl', function($scope, $location) {
+                app.controller('searchLandingCtrl', function($scope, $location, searchInputService) {
                     $scope.formSubmit = function() {
-                        $location.url('/results');
                         $scope.$parent.$broadcast('query', $scope.searchTerm);
-                    }
-                    $scope.searchMe = function($event) {
-                        $scope.searchTerm = $event.currentTarget.text;
-                        $scope.formSubmit();
+						searchInputService.setFreqTerm($scope.searchTerm);
+                        $location.url('/results');
                     }
                 });
 
@@ -144,14 +141,29 @@
                         }
                     }
                 });
-
-                app.component('searchPage', {
-					controller: function($window) {
-						this.loadRootPage = function() {
-							$window.location.href = '/poc-app/search-page.html';
+				
+				app.component('recentSearchTerms', {
+					controller: function($scope, searchInputService) {
+						this.freqTerm = searchInputService.getFreqTerm();
+						this.searchMe = function($event) {
+							$scope.$parent.searchTerm = $event.currentTarget.text;
+							$scope.$parent.formSubmit();
 						}
 					},
-					template: '<div class="search-page-link"> <a href="javascript:void(0);" ng-click="$ctrl.loadRootPage()"> Go to Search Page </a> </div>'
+					template: function($element) {
+						return '<a href="javascript:void(0);" ng-click="$ctrl.searchMe($event)"><span>{{$ctrl.freqTerm}}</span></a>'
+					}
+				});
+				
+                app.component('searchPage', {
+					controller: function($window, $attrs) {
+						this.loadRootPage = function() {
+							$window.location.href = $attrs.url;
+						}
+					},
+					template: function($element, $attrs) {
+						return '<div class="search-page-link"> <a href="javascript:void(0);" ng-click="$ctrl.loadRootPage()"> Go to Search Page </a> </div>'
+					}
                 });
 
                 app.directive('loadMoreDir', function() {
