@@ -83,7 +83,10 @@
                         return this.freqTerm;
                     }
                     var setFreqTerm = function(queryTerm) {
-						this.freqTerm = queryTerm;
+						if(this.freqTerm == undefined) {
+							this.freqTerm = new Array();
+						}
+						this.freqTerm.unshift(queryTerm);
                     }
                     return {getTerm: getTerm, setTerm: setTerm, getFreqTerm: getFreqTerm, setFreqTerm: setFreqTerm};
                 });
@@ -106,7 +109,6 @@
                     $scope.hide = function(index) {
                         return (index > $scope.rowsToBeShown) ? true : false;
                     }
-					// Function to understand '<' directive scope binding
 					$scope.getSearchTerm = function() {
 						return searchInputService.getTerm();
 					}
@@ -118,7 +120,12 @@
 						searchInputService.setFreqTerm($scope.searchTerm);
                         $location.url('/results');
                     }
-                });
+					$scope.searchMe = function($event) {
+						$scope.searchTerm = $event.currentTarget.text;
+						$scope.formSubmit();
+					}
+					$scope.freqTerm = searchInputService.getFreqTerm();
+				});
 
                 app.directive('getResultDir', function(searchService, $route) {
                     return {
@@ -142,16 +149,25 @@
                     }
                 });
 				
-				app.component('recentSearchTerms', {
-					controller: function($scope, searchInputService) {
-						this.freqTerm = searchInputService.getFreqTerm();
-						this.searchMe = function($event) {
-							$scope.$parent.searchTerm = $event.currentTarget.text;
-							$scope.$parent.formSubmit();
+				app.directive('recentSearchTerms', function(searchInputService) {
+					var initialStr = '<a href="javascript:void(0);" ng-click="searchMe($event)"><span>';
+					var finalStr = '</span></a>';
+					return {
+						restrict: 'A',
+						scope: false,
+						template: function(elem, attr) {
+							var output = '';
+							var freqTerm = searchInputService.getFreqTerm();
+							if(freqTerm !== undefined) {
+								for(var key in freqTerm) {
+									if(key != 0) {
+										output = output + ', ';
+									}
+									output = output + initialStr + freqTerm[key] + finalStr;
+								}
+							}
+							return output;
 						}
-					},
-					template: function($element) {
-						return '<a href="javascript:void(0);" ng-click="$ctrl.searchMe($event)"><span>{{$ctrl.freqTerm}}</span></a>'
 					}
 				});
 				
