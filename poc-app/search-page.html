@@ -4,6 +4,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-local-storage/0.7.1/angular-local-storage.min.js"></script>
 <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 <base href='/poc-app/'/>
@@ -12,7 +13,7 @@
 			<search-page url='/poc-app/search-page.html'> </search-page>
             <div class='ng-view'></div>
             <script>
-                var app = angular.module('myApp', ['ngRoute','ui.bootstrap']);
+                var app = angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ui.bootstrap']);
 				
                 app.config(function($routeProvider, $locationProvider) {
                     $routeProvider.when('/landing', {
@@ -71,27 +72,26 @@
                     return {getResults: getResults};
                 });
 
-                app.factory('searchInputService', function() {
-                    var term, freqTerm;
+                app.factory('searchInputService', function(localStorageService) {
+                    var term;
                     var getTerm = function() {
                         return this.term;
                     }
                     var setTerm = function(queryTerm) {
 						this.term = queryTerm;
                     }
-                    var getFreqTerm = function() {
-                        return this.freqTerm;
-                    }
                     var setFreqTerm = function(queryTerm) {
-						if(this.freqTerm == undefined) {
-							this.freqTerm = new Array();
+						var freqTermArr = localStorageService.get('freqTerm');
+						if(freqTermArr == null) {
+							freqTermArr = new Array();
 						}
-						this.freqTerm.unshift(queryTerm);
+						freqTermArr.unshift(queryTerm);
+						localStorageService.set('freqTerm', freqTermArr);
                     }
-                    return {getTerm: getTerm, setTerm: setTerm, getFreqTerm: getFreqTerm, setFreqTerm: setFreqTerm};
+                    return {getTerm: getTerm, setTerm: setTerm, setFreqTerm: setFreqTerm};
                 });
 
-                app.controller('searchResultCtrl', function($scope, searchInputService, results) {
+                app.controller('searchResultCtrl', function($scope, searchInputService, results, localStorageService) {
                     $scope.rowsToBeShown = 10;
                     $scope.searchTerm = searchInputService.getTerm();
                     $scope.reverse = false;
@@ -114,7 +114,7 @@
 					}
                 });
 
-                app.controller('searchLandingCtrl', function($scope, $location, searchInputService) {
+                app.controller('searchLandingCtrl', function($scope, $location, searchInputService, localStorageService) {
                     $scope.formSubmit = function() {
                         $scope.$parent.$broadcast('query', $scope.searchTerm);
 						searchInputService.setFreqTerm($scope.searchTerm);
@@ -124,7 +124,6 @@
 						$scope.searchTerm = $event.currentTarget.text;
 						$scope.formSubmit();
 					}
-					$scope.freqTerm = searchInputService.getFreqTerm();
 				});
 
                 app.directive('getResultDir', function(searchService, $route) {
@@ -149,7 +148,7 @@
                     }
                 });
 				
-				app.directive('recentSearchTerms', function(searchInputService) {
+				app.directive('recentSearchTerms', function(localStorageService) {
 					var initialStr = '<a href="javascript:void(0);" ng-click="searchMe($event)"><span>';
 					var finalStr = '</span></a>';
 					return {
@@ -157,8 +156,11 @@
 						scope: false,
 						template: function(elem, attr) {
 							var output = '';
-							var freqTerm = searchInputService.getFreqTerm();
-							if(freqTerm !== undefined) {
+							var freqTerm = localStorageService.get('freqTerm');
+							if(freqTerm !== null) {
+								if(freqTerm.length > 5) {
+									freqTerm = freqTerm.slice(0, 5);
+								}
 								for(var key in freqTerm) {
 									if(key != 0) {
 										output = output + ', ';
