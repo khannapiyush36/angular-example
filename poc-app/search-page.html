@@ -81,17 +81,23 @@
 						this.term = queryTerm;
                     }
                     var setFreqTerm = function(queryTerm) {
+						localStorageService.set('freqTerm', updateFreqTerms(queryTerm));
+                    }
+					var updateFreqTerms = function(queryTerm) {
 						var freqTermArr = localStorageService.get('freqTerm');
 						if(freqTermArr == null) {
 							freqTermArr = new Array();
 						}
+						if(freqTermArr.indexOf(queryTerm) != -1) {
+							freqTermArr.splice(freqTermArr.indexOf(queryTerm), 1);
+						}
 						freqTermArr.unshift(queryTerm);
-						localStorageService.set('freqTerm', freqTermArr);
-                    }
+						return freqTermArr;
+					}
                     return {getTerm: getTerm, setTerm: setTerm, setFreqTerm: setFreqTerm};
                 });
 
-                app.controller('searchResultCtrl', function($scope, searchInputService, results, localStorageService) {
+                app.controller('searchResultCtrl', function($scope, searchInputService, results) {
                     $scope.rowsToBeShown = 10;
                     $scope.searchTerm = searchInputService.getTerm();
                     $scope.reverse = false;
@@ -114,7 +120,7 @@
 					}
                 });
 
-                app.controller('searchLandingCtrl', function($scope, $location, searchInputService, localStorageService) {
+                app.controller('searchLandingCtrl', function($scope, $location, searchInputService) {
                     $scope.formSubmit = function() {
                         $scope.$parent.$broadcast('query', $scope.searchTerm);
 						searchInputService.setFreqTerm($scope.searchTerm);
@@ -151,24 +157,27 @@
 				app.directive('recentSearchTerms', function(localStorageService) {
 					var initialStr = '<a href="javascript:void(0);" ng-click="searchMe($event)"><span>';
 					var finalStr = '</span></a>';
+					var prepareRSTerms = function() {
+						var output = '';
+						var freqTerm = localStorageService.get('freqTerm');
+						if(freqTerm !== null) {
+							if(freqTerm.length > 5) {
+								freqTerm = freqTerm.slice(0, 5);
+							}
+							for(var key in freqTerm) {
+								if(key != 0) {
+									output = output + ', ';
+								}
+								output = output + initialStr + freqTerm[key] + finalStr;
+							}
+						}
+						return output;
+					}
 					return {
 						restrict: 'A',
 						scope: false,
 						template: function(elem, attr) {
-							var output = '';
-							var freqTerm = localStorageService.get('freqTerm');
-							if(freqTerm !== null) {
-								if(freqTerm.length > 5) {
-									freqTerm = freqTerm.slice(0, 5);
-								}
-								for(var key in freqTerm) {
-									if(key != 0) {
-										output = output + ', ';
-									}
-									output = output + initialStr + freqTerm[key] + finalStr;
-								}
-							}
-							return output;
+							return prepareRSTerms();
 						}
 					}
 				});
