@@ -22,12 +22,7 @@
                     }).
                     when('/results', {
                         templateUrl: 'search-results.html',
-                        controller: 'searchResultCtrl',
-                        resolve: {
-                            results : function(searchService) {
-								return searchService.getResults();
-                            }
-                        }
+                        controller: 'searchResultCtrl'
                     }).
                     otherwise({
                         redirectTo: '/landing'
@@ -97,7 +92,7 @@
                     return {getTerm: getTerm, setTerm: setTerm, setFreqTerm: setFreqTerm};
                 });
 
-                app.controller('searchResultCtrl', function($scope, searchInputService, results) {
+                app.controller('searchResultCtrl', function($scope, searchInputService, searchService) {
                     $scope.rowsToBeShown = 10;
                     $scope.searchTerm = searchInputService.getTerm();
                     $scope.reverse = false;
@@ -111,13 +106,19 @@
                             return new Date(x.pubDate);
                         }    
                     }
-                    $scope.output = results;
+                    $scope.getResults = function() {
+						var promise = searchService.getResults();
+						promise.then(function(data) {
+							$scope.output = data;
+						})
+					}
                     $scope.hide = function(index) {
                         return (index > $scope.rowsToBeShown) ? true : false;
                     }
 					$scope.getSearchTerm = function() {
 						return searchInputService.getTerm();
 					}
+					$scope.getResults();
                 });
 
                 app.controller('searchLandingCtrl', function($scope, $location, searchInputService) {
@@ -237,12 +238,17 @@
                     }
                 });
 				
-				// Example to understand 2-way binding with function call
-				app.component('searchText', {
-					bindings: {
-						term: '&'
-					},
-					template: '<b> {{$ctrl.term()}} </b>'
+				// Example to provide controller as a dependency to
+				// directive when it has an isolated scope.
+				// Controller should be available in scope to inject
+				// successfully into directive at compile time.
+				app.directive('searchText', function() {
+					return {
+						restrict: 'A',
+						scope: {},
+						controller: 'searchResultCtrl',
+						template: '<b> {{getSearchTerm()}} </b>'
+					}
 				});
 
             </script>
