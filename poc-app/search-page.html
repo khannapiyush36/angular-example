@@ -132,13 +132,14 @@
 					}
 				});
 
-                app.directive('getResultDir', function(searchService, $route) {
+                app.directive('getResultDir', function(searchInputService, $route) {
                     return {
                         restrict: 'A',
 						scope: false,
                         link: function($scope, element, attrs) {
                             element.click(function() {
 								$scope.$parent.$broadcast('query', $scope.searchTerm);
+								searchInputService.setFreqTerm($scope.searchTerm);
 								$route.reload();
                             });
                         }
@@ -175,7 +176,6 @@
 					}
 					return {
 						restrict: 'A',
-						scope: false,
 						template: function(elem, attr) {
 							return prepareRSTerms();
 						}
@@ -208,7 +208,12 @@
                         }
                     }
                 });
-
+				
+				/**
+					'<' - One way binding from Model to View (Work if passed expression/attribute
+							is of string nature and not object)
+					'=' - Two way binding from Model to View & View to Model
+				*/
                 app.directive('myModel', function() {
                     return {
                         restrict: 'A',
