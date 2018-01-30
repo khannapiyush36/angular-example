@@ -44,17 +44,10 @@
 						searchInputService.setTerm(data);
                     });
                 });
-
-                app.factory('searchService', function($http, $q) {
-					// Deprecated
-                    var getToken = function() {
-                        var deferred = $q.defer();
-                        $http.get('/libs/granite/csrf/token.json').then(function(response) {
-                            deferred.resolve(response.data.token);
-                        });
-                        return deferred.promise;
-                    }
-                    var getResults = function(term, limit) {
+				
+				/* Search Results Service Definition */
+				var searchService = function($http, $q) {
+                    this.getResults = function(term, limit) {
                         var deferred = $q.defer();
 						$http({
 							method: 'GET',
@@ -64,19 +57,17 @@
 						});
                         return deferred.promise;
                     }
-                    return {getResults: getResults};
-                });
-
-                app.factory('searchInputService', function(localStorageService) {
+                };
+                app.service('searchService', searchService);
+				
+				/*Search Input Service Definition */
+				var searchInputService = function(localStorageService) {
                     var term;
-                    var getTerm = function() {
+                    this.getTerm = function() {
                         return this.term;
                     }
-                    var setTerm = function(queryTerm) {
+                    this.setTerm = function(queryTerm) {
 						this.term = queryTerm;
-                    }
-                    var setFreqTerm = function(queryTerm) {
-						localStorageService.set('freqTerm', updateFreqTerms(queryTerm));
                     }
 					var updateFreqTerms = function(queryTerm) {
 						var freqTermArr = localStorageService.get('freqTerm');
@@ -89,10 +80,13 @@
 						freqTermArr.unshift(queryTerm);
 						return freqTermArr;
 					}
-                    return {getTerm: getTerm, setTerm: setTerm, setFreqTerm: setFreqTerm};
-                });
+                    this.setFreqTerm = function(queryTerm) {
+						localStorageService.set('freqTerm', updateFreqTerms(queryTerm));
+                    }
+                };
+                app.service('searchInputService', searchInputService);
 
-                app.controller('searchResultCtrl', function($scope, searchInputService, searchService) {
+                app.controller('searchResultCtrl', ['$scope', 'searchInputService', 'searchService', function($scope, searchInputService, searchService) {
                     $scope.rowsToBeShown = 10;
                     $scope.searchTerm = searchInputService.getTerm();
                     $scope.reverse = false;
@@ -119,9 +113,9 @@
 						return searchInputService.getTerm();
 					}
 					$scope.getResults();
-                });
+                }]);
 
-                app.controller('searchLandingCtrl', function($scope, $location, searchInputService) {
+                app.controller('searchLandingCtrl', ['$scope', '$location', 'searchInputService', function($scope, $location, searchInputService) {
                     $scope.formSubmit = function() {
                         $scope.$parent.$broadcast('query', $scope.searchTerm);
 						searchInputService.setFreqTerm($scope.searchTerm);
@@ -131,7 +125,7 @@
 						$scope.searchTerm = $event.currentTarget.text;
 						$scope.formSubmit();
 					}
-				});
+				}]);
 
                 app.directive('getResultDir', function(searchInputService, $route) {
                     return {
