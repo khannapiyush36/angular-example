@@ -1,0 +1,100 @@
+1. 6.4 features 
+	a. Touch UI - Dialog, Customization, Event listeners etc.
+	b. Content Fragments
+	c. Content Fragment Model
+	d. Experience Fragments
+	e. Style System
+	f. Editable Templates - Initial Content, Structure
+2. OSGi R6 Annotations vs Sling annotations
+3. Event Handlers & Job Consumers
+4. Oak based Login Module - SSO
+5. LDAP Integration
+6. CI/CD - Batch jobs written in shell script
+	a. Teamcity - It picks up changes from TFS for a specific branch and build the package and make it deploy ready e.g. Octopus deployable release.
+	b. Octopus - Octopus deployable release is deployed to specific environment.
+	c. TFS - Versioning Tool (for code check-in & check-out)
+7. AEM Upgrade (In-Place) - 
+	i) 5.6.1 to 6.2
+		a. Run crx2oak tool for repository upgrade
+		b. Issues while upgrade
+			a. Read permission on /etc/tags gets lost OR is not given by default in 6.2. Hence if our code under AEM 5.x expects that to happen, it will be 
+			tricky.
+	ii) 6.2 to 6.4
+		a. Run the Pattern Detector
+		b. Issues while upgrade - 
+			a. Full Indexing for assets keep on going when post upgrade instance gets started up first time which increases start time.
+			b. SegmentNodeStore should have relative paths in case we have repository stored somewhere else other than /crx-quickstart directory.
+			c. If code has tag root path as /etc/tags defined somewhere, it will break. Because Tag root path has been changed to /content/cq:tags. 
+				In case of AEM to start using that root path, we should restart component "JCRTagManagerFactoryImpl".
+8. TarMK vs MongoMK
+9. Tar Optimization (online vs offline)
+10. ASRP Integration - Storing UGC to Adobe based Cloud Storage, hence avoiding RR & saving n/w bandwidth.
+	a. ASRP details gets updated onto node '/etc/socialconfig/srpc/defaultconfiguration' as property 'asipath' with value '/content/usergenerated/asi/cloud'
+	b. Instance of factory configuration 'AEM Communities Cloud Storage Resource Provider' should not be more than 1. This could be the case for in-place 
+	upgraded instance.
+11. Personalization using Context Hub
+	a. Create Segments under 'Audience' (Start -> Personalization -> Audience)
+	b. Author these segments using 'Comparison: Property-Value' component.
+	c. Map these Segments Root path to website Root page via Page Properties -> Personalization tab
+	b. Create Campaign
+	c. Create Experiences for each audience/segment (created in steps a,b)
+	d. Create Offers
+	e. Use Offers with-in experience
+	f. Provide segment variation with-in same experience
+	g. activate that campaign.
+	h. Issues faced - 
+		i) Global Clientlibs of page has to load 'granite.utils' & 'granite.jquery' via dependency/embed. This is needed because contextHub has dependent
+			functionalities written in it.
+		ii) Load personalized content onto publish instance. By default, Context Hub loads anonymous user's profile. We need to load respective user's profile
+			into context hub's profile store, so that it can load matching segments. This can be done at client side via invoking
+			"ContextHub.getStore('profile').loadProfile(userPath)" where userPath is required User's path
+			OR
+			Let the path be 'anonymous' but ensure respective user's necessary attributes are loaded while overriding profile store's success handler.
+12. SOLR Integration using SolrJ API
+	a. Indexing 
+	b. Query
+13. Twitter Feed Integration using acs-commons twitter component/service
+14. SalesForce Integration
+15. Convert WSDL -> jar -> OSGi Jar
+16. Analytics Integration using DTM & Launch and via Data layer approach.
+	a. Defining Events, Rules at DTM/launch side
+	b. Creating and populating variables in Data Layer
+	c. Binding Launch Analytics to website using 'async' script inclusion.
+17. Core component use cases
+18. Migration from other CMS to AEM e.g. iKnow (Moxie)
+19. Overriding Random node name creation by providing a higher priority custom component 'JCRAuthorizableNodeName' and disabling OOTB 
+	'RandomAuthorizableNodeName'
+20. Page based reporting on a lines of asset based reporting
+21. Sling Model
+	a. Annotations
+	b. Caching
+	c. Sling Model Exporter - https://docs.adobe.com/content/help/en/experience-manager-learn/foundation/development/develop-sling-model-exporter.html
+22. Expression Customizer in AEM (use of implicit "cqDesign" object to access design dialog level properties and make certain conditions based on that)
+23. CSRF Filter
+24. Dispatcher (using IIS) on Windows
+	a. Cache folder not getting created - Root folder of webserver e.g. /inetpub/wwwroot should have write access to below Users
+		i) Default App Pool (IIS AppPool\DefaultAppPool)
+		ii) IUSR
+	b. logs not generating - Logs folder should also have write access to below Users
+		i) Default App Pool (IIS AppPool\DefaultAppPool)
+	c. Vanity Url - https://blog.kristianwright.com/2016/02/11/aem-dispatcher-and-vanity-urls/
+	d. URL Rewriting
+	e. .stat file not getting created - It gets created via Dispatcher Flush agent (https://www.axamit.com/blog/adobe/dispatcher-4)
+		i) .stat file has latest timestamp - means cached file is outdated.. fetch new
+		ii) .stat file has older timestamp compared to file requested - cache is latest.. serve it.
+	f. "/enableTTL" Significance - it is used to automatically mark the cache file invalid. If this is set to "1", and response of the page/component has header 
+		"cache-control: max-age="<time in seconds>" OR "expires", then one ttl file besides the cached file is generated. It's timestamp is equal
+		to the expiry date OR cached file time + max-age.
+	g. How does sticky connections work - It works based on the concept of "Pass a cookie named 'renderid' with value of render name, in the request". 
+		This ensures requests are tied up with one publish instance.
+25. Custom Predicate
+	a. Provide a overriding definition of 'includes' method which says, include a result only if certain condition is met.
+26. Workflows, Clientlibs changes in AEM 6.4
+	a. Workflows are now stored under /conf/global/settings/workflows
+27. Best Practices to move things from /etc as per AEM 6.4 onwards version
+	a. Move /etc/designs to /apps/<>/settings/wcm/designs
+27. Code coverage Tools
+28. Unit Testing
+29. HTL
+30. 
+	
